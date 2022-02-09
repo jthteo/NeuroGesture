@@ -8,6 +8,6 @@ Does not work on Gemini V5; Javascript support was deprecated by Ultraleap/Leapm
 [https://support.leapmotion.com/hc/en-us/articles/360004493917-Javascript-FAQs](https://support.leapmotion.com/hc/en-us/articles/360004493917-Javascript-FAQs)
 ## :-(
 
-Still works on Orion V4 from Leapmotion [legacy Orion v4 download](https://developer-archive.leapmotion.com/downloads/external/v4-1-hand-tracking/windows?version=4.1.0)
+Still works on Orion Software Version: 4.1 from Leapmotion [legacy Orion v4 download](https://developer-archive.leapmotion.com/downloads/external/v4-1-hand-tracking/windows?version=4.1.0) Fingers need fixing.
 
 ![screenshot](screenshot_2014.jpg)
