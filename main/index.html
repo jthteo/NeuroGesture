@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>NeuroGesture. Version 0.3, Copyright 2014 Dr James Teo
+</title>
+              <link href="style.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+    <input type=button value="Postural Tremor" id="btn" style="position: absolute; left: 10%; top: 15%; " onclick="window.location='postural_1.html';" />
+    <input type=button value="Action Tremor" id="btn" style="position: absolute; left: 43.5%; top: 15%; " onclick="window.location='action_lines1.html';" />
+    <input type=button value="Bradykinesia/ Diadochokinesia" id="btn" style="position: absolute; left: 72.5%; top: 15%; " onclick="window.location='RAM.html';" />
+    
+<canvas id="myCanvas">
+
+</canvas>
+
+<script src="../leap.js"></script>
+
+<script>
+    var c = document.getElementById("myCanvas");
+    //resize window
+    window.addEventListener('resize', resizeCanvas, false);
+
+    function resizeCanvas()
+    {
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+        drawTitle();
+        drawInstructionPostural();
+        drawInstructionAction();
+        drawInstructionRAM();
+        drawCopyright();
+    }
+    resizeCanvas(); 
+
+    function drawTitle()
+    {
+        var ctx = c.getContext("2d");
+        ctx.font = "bold 60pt Century Gothic";
+        ctx.fillStyle = "navy";
+        //ctx.lineWidth=1;
+        ctx.fillText("N   G", c.width - 300, c.height / 16 + 25);
+        ctx.font = "bold 20pt Century Gothic";
+        ctx.fillText("euro", c.width - 245, c.height / 16 - 10);
+        ctx.fillText("esture", c.width - 115, c.height / 16 + 25);
+        ctx.strokeStyle = "royalblue";
+        ctx.lineWidth = 1;
+        var border = c.getContext("2d");
+        border.strokeStyle = "royalblue";
+        border.lineWidth = 10;
+
+        //left border
+        border.beginPath();
+        border.stroke();
+        border.beginPath();
+        border.moveTo(c.width / 3, c.height / 8);
+        border.lineTo(c.width / 3, c.height * 5 / 7);
+        border.stroke();
+        border.beginPath();
+        border.stroke();
+        //right border
+        border.beginPath();
+        border.stroke();
+        border.beginPath();
+        border.moveTo(c.width * 2 / 3 - 20, c.height / 8);
+        border.lineTo(c.width * 2 / 3 - 20, c.height * 5 / 7);
+        border.stroke();
+        border.beginPath();
+        border.stroke();
+        //top border
+        border.beginPath();
+        border.arc(20, c.height / 8, 10, 0, 2 * Math.PI);
+        border.stroke();
+        border.beginPath();
+        border.moveTo(25, c.height / 8);
+        border.lineTo(c.width - 25, c.height / 8);
+        border.stroke();
+        border.beginPath();
+        border.arc(c.width - 20, c.height / 8, 10, 0, 2 * Math.PI);
+        border.stroke();
+        //bottom border
+        border.beginPath();
+        border.arc(20, c.height * 5 / 7, 10, 0, 2 * Math.PI);
+        border.stroke();
+        border.beginPath();
+        border.moveTo(25, c.height * 5 / 7);
+        border.lineTo(c.width - 25, c.height * 5 / 7);
+        border.stroke();
+        border.beginPath();
+        border.arc(c.width - 20, c.height * 5 / 7, 10, 0, 2 * Math.PI);
+        border.stroke();
+    }
+    //"draw" the instruction
+    function drawInstructionPostural()
+    {
+        var postural = c.getContext("2d");
+        var img = new Image();
+        img.src = "postural_1.jpg";
+        postural.drawImage(img, 0, c.height / 3, c.width / 3 - 5, 200);
+    }
+    //"draw" the instruction
+    function drawInstructionAction()
+    {
+        var centerx = c.width / 2;
+        var centery = c.height / 2 - 35;
+        var a = 8, b = 8;
+        var context = c.getContext("2d");
+        context.moveTo(centerx, centery);
+        context.beginPath();
+        for (i = 0; i < 160; i++)
+        {
+            angle = 0.1 * i;
+            x = centerx + (a + b * angle) * Math.cos(angle);
+            y = centery + (a + b * angle) * Math.sin(angle);
+            context.lineTo(x, y);
+        }
+        context.strokeStyle = "royalblue";
+        context.lineWidth = 9;
+        context.stroke();
+        context.strokeStyle = "navy";
+        context.lineWidth = 10;
+        context.beginPath();
+        context.arc(centerx, centery, 10, 0, 2 * Math.PI);
+        context.stroke();
+        context.strokeStyle = "navy";
+        context.lineWidth = 10;
+        context.beginPath();
+        context.arc(x, y - 25, 10, 0, 2 * Math.PI);
+        context.stroke();
+    }
+    //"draw" the instruction
+    function drawInstructionRAM()
+    {
+        var ram = c.getContext("2d");
+        var img = new Image();
+        img.src = "RAM.jpg";
+        ram.drawImage(img, c.width * 2 / 3 + 20, c.height * 2 / 7, c.width / 3 - 20, 250);
+    }
+    //"draw" the copyright
+    function drawCopyright()
+    {
+        var copyright = c.getContext("2d");
+        copyright.font = "bold italic 9pt Century Gothic";
+        copyright.fillStyle = "navy";
+        copyright.fillText("Copyright 2014 Dr James Teo", c.width - 200, c.height * 5/7 + 50);
+    }
+</script>
+
+</body>
+</html>

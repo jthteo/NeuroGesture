@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Postural Tremor</title>
+        <link href="style.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <ul id="nav">
+            <li class="current"><a href="index.html">Home</a></li>
+            
+            <li><a href="postural_1.html">Postural Tremor</a>
+                <ul>
+                    <li><a href="postural_1.html">Hands outstretched</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Action Tremor</a>
+                <ul>
+                    <li><a href="action_lines1.html">Pointing Level 1</a></li>
+                    <li><a href="action_lines2.html">Pointing Level 2</a></li>
+                    <li><a href="action_lines3.html">Pointing Level 3</a></li>
+                    <li><a href="action_lines4.html">Pointing Level 4</a></li>
+                    <li><a href="action_spiral.html">Draw Spiral</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Bradykinesia and Diadochokinesia</a>
+                <ul>
+                    <li><a href="Brady.html">Bradykinesia</a></li>
+                    <li><a href="RAM.html">Diadochokinesia</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Generic</a>
+                <ul>
+                    <li><a href="postural_2.html">Any task</a></li>
+                </ul>
+            </li>
+        </ul>
+       <canvas id="myCanvas" style="border:5px solid navy">
+       </canvas>
+       <input type=button value="START" id="btn" style="position: absolute; right:50%; top: 85%; " onclick="recordData(60)" />
+       
+<script src="../leap.js"></script>
+<script>
+    var c=document.getElementById("myCanvas");
+    var logleap=0;
+    //initialization
+    var leftPerformance="",rightPerformance="",totalPerformance="";
+    var fingernoleft=0,fingernoright=0,framewrong=0,frameaccurate=0,totalframe=0;
+    //test performance:Accurate, Wrong, Adequate
+    //resize window
+    window.addEventListener('resize', resizeCanvas, false);
+    
+    function resizeCanvas() {
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+        drawInstruction();
+        drawCopyright();
+        //draw palm
+        var palm=c.getContext("2d");
+        //var PrevFrame=null;
+        Leap.loop(function(frame){
+                  
+                  //if (!PrevFrame&&frame.valid) {PrevFrame = frame;}
+                  if (frame.hands===undefined){
+                  var handslength=0;
+                  leftPerformance="Poor";
+                  rightPerformance="Poor";
+                  totalPerformance="Poor";
+                  }
+                  else{var handslength=frame.hands.length;}
+                  palm.clearRect(0,0,c.width,c.height);
+                  //draw instruction
+                  drawInstruction();
+                  //drawCopyright();
+                  //draw hand
+                  for(var handId=0,handCount=handslength;handId!=handCount;handId++){
+                  var hand = frame.hands[handId];
+                  var xpos = c.width/2+(hand.palmPosition[0]*3);
+                  var ypos = c.height-(hand.palmPosition[1]*3)-100;
+                  //draw palm
+                  palm.lineWidth=10;
+                  for(var i=1;i<=10;i++)
+                  {
+                  palm.strokeStyle="navy";
+                  palm.beginPath();
+                  palm.rect(xpos,ypos,25,25);
+                  //palm.arc(xpos,ypos,5,0,2*Math.PI);
+                  palm.stroke();
+                  }
+                  //xpos,ypos,r,0,2*PI
+//                  palm.strokeStyle="maroon";
+//                  palm.beginPath();
+//                  palm.arc(xpos,ypos,15,0,2*Math.PI);
+//                  palm.stroke();
+                  
+                  //draw fingers for each hand
+                  var finger=c.getContext("2d");
+                  for (var n = 0; n<hand.fingers.length; n++) {
+                  
+                  //define accurate case
+                  var fingertip = hand.fingers[n];
+                  var xpos = c.width/2+(fingertip.stabilizedTipPosition[0]*3);
+                  var ypos = c.height-(fingertip.stabilizedTipPosition[1]*3)-100;
+                  finger.lineWidth=8;
+                  finger.strokeStyle="navy";
+                  finger.beginPath();
+                  finger.arc(xpos,ypos,20,0,2*Math.PI);
+                  finger.stroke();
+                  finger.fillStyle="royalblue";
+                  finger.beginPath();
+                  finger.arc(xpos,ypos,10,0,2*Math.PI);
+                  finger.fill();
+                  
+                  /*draw index
+                   var index=c.getContext("2d");
+                   index.font="16pt Futura";
+                   index.fillStyle="green";
+                   index.lineWidth=10;
+                   index.fillText(n+"",xpos,ypos);*/
+                  }//end finger loop
+                  var result=c.getContext("2d");
+                  
+                  if (handId==0){
+                  fingernoleft=hand.fingers.length;
+                  result.lineWidth=1;
+                  result.strokeStyle="navy";
+                  result.strokeText(""+fingernoleft,150,270);
+                  //if each finger appears/disappears more than once within 50 millisecs, system performance poor.
+                  if(handslength==1&&hand.fingers.length>4){leftPerformance="Accurate";}
+                  else if (handslength==1&&hand.fingers.length==3){leftPerformance="Adequate";}
+                  else if (handslength!=1||hand.fingers.length<3)//need to be modified
+                  {leftPerformance="Poor";}
+                  result.strokeText(""+leftPerformance,150,390);
+                  }//end hand1
+                  else if (handId==1){
+                  fingernoright=hand.fingers.length;
+                  result.lineWidth=1;
+                  result.strokeStyle="navy";
+                  result.strokeText(""+fingernoright,150,300);
+                  if(handslength==1&&hand.fingers.length>4){rightPerformance="Accurate";}
+                  else if (handslength==1&&hand.fingers.length==3)
+                  {rightPerformance="Adequate";}
+                  else if (handslength!=1||hand.fingers.length<3)//need to be modified
+                  {rightPerformance="Poor";}
+                  result.strokeText(""+rightPerformance,150,420);
+                  }//end hand2
+
+                  }//end hand loop
+                  var result=c.getContext("2d");
+                  result.lineWidth=1;
+                  result.strokeStyle="navy";
+                  result.strokeText(""+handslength,200,180);
+                  if (logleap==1){
+                  if (leftPerformance=="Accurate"&&rightPerformance=="Accurate"){
+                  //totalPerformance="Accurate";
+                  frameaccurate++;
+                  }
+                  else if (leftPerformance=="Poor"||rightPerformance=="Poor"){
+                  //totalPerformance="Poor";
+                  framewrong++;
+                  }
+                  //else{totalPerformance="Fair";}
+                  //result.strokeText(""+totalPerformance,980,450);
+                 
+                  totalframe++;
+                  }//end loop logleap==1
+                  
+                });
+    }
+resizeCanvas();
+//draw instruction
+function drawInstruction(){
+    var ctx=c.getContext("2d");
+    ctx.font="Bold 12pt Century Gothic";
+    ctx.fillStyle="royalblue";
+    ctx.lineWidth=5;
+    ctx.fillText("Postural Tremor Detection:",c.width/10+200,60);
+    ctx.font="Bold 15pt Century Gothic";
+    ctx.fillStyle="navy";
+    //ctx.lineWidth=1;
+    ctx.fillText("Hold hands outstretched with palms down for 60 seconds",c.width/10+200,90);
+    var img=new Image(); //creates a variable for a new image
+    img.src="postural_1.jpg";
+    ctx.drawImage(img,250,130);
+    
+//draw performance panel
+    ctx.lineWidth=5;
+    ctx.strokeStyle="royalblue";
+    
+    ctx.strokeRect(50,135,250,180);
+    ctx.font="15pt Century Gothic";
+    ctx.lineWidth=1;
+    ctx.strokeStyle="navy";
+    ctx.strokeText("Recording Quality",65,180);
+    ctx.strokeText("No.of Fingers:",65,240);
+    ctx.strokeText("Hand 1: ",65,270);
+    ctx.strokeText("Hand 2: ",65,300);
+//    ctx.strokeText("Tracking Performance",65,360);
+//    ctx.strokeText("Hand 1: ",65,390);
+//    ctx.strokeText("Hand 2: ",65,420);
+}
+
+function sendflag(data){
+//send flag message by ajax call
+    var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+    xmlhttp.open("POST","http://localhost:8000", "/json-handler");
+    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xmlhttp.send(JSON.stringify(data));
+             }
+             
+//countdown
+function countdown(secs) {
+    var initial=secs;
+    var btn = document.getElementById('btn');
+    btn.value = secs+" seconds";
+    --secs;
+	var timer = setTimeout('countdown('+secs+')',1000);
+    
+    if(secs < 0) {
+		clearTimeout(timer);
+		btn.value = 'Restart';
+        secs=initial;
+        var total=c.getContext("2d");
+        if(frameaccurate/totalframe>0.9){totalPerformance="Accurate";}
+        else if (framewrong/totalframe<0.1){totalPerformance="Adequate";}
+        else{totalPerformance="Poor";}
+        total.strokeText(""+totalPerformance,980,450);
+//        alert(""+Math.floor(frameaccurate/totalframe*100)+"% of frames are accurate and "+Math.floor(framewrong/totalframe*100)+"% of frames are poor."+"\n"+"The quality of this recording is: "+totalPerformance);
+        logleap=0;
+        sendflag(logleap);
+	}//end secs<0
+
+}//end countdown
+
+function recordData(secs){
+    logleap=1;
+    sendflag(logleap);
+    resizeCanvas();
+    countdown(secs);
+}
+
+//"draw" the copyright
+function drawCopyright(){
+        var copyright=c.getContext("2d");
+        copyright.font="12pt Arial";
+        copyright.fillStyle="navy";
+        
+}
+
+    
+    </script>
+</body>
+</html>
