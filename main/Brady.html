@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Bradykinesia</title>
+        <link href="style.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <ul id="nav">
+            <li class="current"><a href="index.html">Home</a></li>
+            
+            <li><a href="postural_1.html">Postural Tremor</a>
+                <ul>
+                    <li><a href="postural_1.html">Hands outstretched</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Action Tremor</a>
+                <ul>
+                    <li><a href="action_lines1.html">Pointing Level 1</a></li>
+                    <li><a href="action_lines2.html">Pointing Level 2</a></li>
+                    <li><a href="action_lines3.html">Pointing Level 3</a></li>
+                    <li><a href="action_lines4.html">Pointing Level 4</a></li>
+                    <li><a href="action_spiral.html">Draw Spiral</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Bradykinesia and Diadochokinesia</a>
+                <ul>
+                    <li><a href="Brady.html">Bradykinesia</a></li>
+                    <li><a href="RAM.html">Diadochokinesia</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Generic</a>
+                <ul>
+                    <li><a href="postural_2.html">Any task</a></li>
+                </ul>
+            </li>
+        </ul>
+        
+<canvas id="myCanvas" style="border:5px solid navy">
+</canvas>
+<input type=button value="Start" id="btn" style="position: absolute; right:400px; top: 500px; " onclick="recordData(20)" />
+
+<script src="../leap.js"></script>
+<script src="Bradykinesia.js"></script>
+<script>
+    var c=document.getElementById("myCanvas");
+    var logleap=0;
+    //initialization
+    var leftPerformance="",rightPerformance="",totalPerformance="";
+    var fingernoleft=0,fingernoright=0,framewrong=0,frameaccurate=0,totalframe=0;
+    //test performance:Accurate, Wrong, Adequate
+    //resize window
+//resize window
+window.addEventListener('resize', resizeCanvas, false);
+
+function resizeCanvas() {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    drawInstruction();
+    //drawCopyright();
+    //draw palm
+    var palm=c.getContext("2d");
+   Leap.loop(function(frame){
+             
+             if (frame.hands===undefined){
+             var handslength=0;
+             leftPerformance="Wrong";
+             rightPerformance="Wrong";
+             totalPerformance="Wrong";
+             }
+             else{var handslength=frame.hands.length;}
+             palm.clearRect(0,0,c.width,c.height);
+             //draw instruction
+             drawInstruction();
+            //track fingers
+   for(var handId=0,handCount=handslength;handId!=handCount;handId++){
+             var hand = frame.hands[handId];
+             var xpos = c.width/2+(hand.palmPosition[0]*3);
+             var ypos = c.height-(hand.palmPosition[1]*3)-100;
+             //draw palm
+             palm.lineWidth=10;
+             for(var i=1;i<=10;i++){
+             palm.strokeStyle="royalblue";
+             palm.beginPath();
+             palm.arc(xpos,ypos,8,0,2*Math.PI);//xpos,ypos,r,0,2PI
+             palm.stroke();
+             }
+             palm.strokeStyle="navy";
+             palm.beginPath();
+             palm.arc(xpos,ypos,15,0,2*Math.PI);
+             palm.stroke();
+
+    //draw pointables
+    var finger=c.getContext("2d");
+             //finger.clearRect(0,0,900,900);
+             
+             for (var fingerId = 0; fingerId<hand.fingers.length; fingerId++) {
+             var fingertip = hand.fingers[fingerId];
+             var xpos = c.width/2+(fingertip.stabilizedTipPosition[0]*3);
+             var ypos = c.height-(fingertip.stabilizedTipPosition[1]*3)-100;
+             finger.lineWidth=8;
+             finger.strokeStyle="navy";
+             finger.beginPath();
+             finger.arc(xpos,ypos,20,0,2*Math.PI);
+             finger.stroke();
+             finger.fillStyle="royalblue";
+             finger.beginPath();
+             finger.arc(xpos,ypos,10,0,2*Math.PI);
+             finger.fill();
+             
+             }//end finger loop
+             var result=c.getContext("2d");
+             
+             totalframe++;
+             }//end loop logleap==1
+             });
+}
+resizeCanvas();
+
+//draw instruction
+function drawInstruction(){
+    var ctx=c.getContext("2d");
+    ctx.font="Bold 12pt Century Gothic";
+    ctx.fillStyle="royalblue";
+    ctx.lineWidth=5;
+    ctx.fillText("Bradykinesia detection",c.width/9,60);
+    ctx.font="Bold 15pt Century Gothic";
+    ctx.fillStyle="navy";
+    ctx.lineWidth=5;
+    ctx.fillText("Tap your index finger with your thumb repeatedly with the rest of your fingers closed",c.width/9,90);
+}
+
+function sendflag(data){
+    //send flag message by ajax call
+    //logleap=1;
+    var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+    xmlhttp.open("POST","http://localhost:8000", "/json-handler");
+    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xmlhttp.send(JSON.stringify(data));
+}
+
+//countdown
+function countdown(secs) {
+        var initial=secs;
+        var btn = document.getElementById('btn');
+        btn.value = secs+" seconds";
+        --secs;
+        var timer = setTimeout('countdown('+secs+')',1000);
+        
+        if(secs < 0) {
+            clearTimeout(timer);
+            btn.value = 'Restart';
+            secs=initial;
+            var total=c.getContext("2d");
+            if(frameaccurate/totalframe>0.9){totalPerformance="Accurate";}
+            else if (framewrong/totalframe<0.1){totalPerformance="Adequate";}
+            else{totalPerformance="Poor";}
+            total.strokeText(""+totalPerformance,980,450);
+//            alert(""+Math.floor(frameaccurate/totalframe*100)+"% of frames are accurate and "+Math.floor(framewrong/totalframe*100)+"% of frames are poor."+"\n"+"The quality of this recording is: "+totalPerformance);
+            logleap=0;
+            sendflag(logleap);
+    }//end secs<0
+        
+}//end countdown
+
+function recordData(secs){
+    logleap=1;
+    sendflag(logleap);
+    resizeCanvas();
+    countdown(secs);
+}
+
+//"draw" the copyright
+function drawCopyright(){
+        var copyright=c.getContext("2d");
+        copyright.font="12pt Arial";
+        copyright.fillStyle="navy";
+        //ctx.lineWidth=1;
+        //ctx.font="bold 20pt Century Gothic";
+        
+    }
+
+    </script>
+</body>
+</html>
