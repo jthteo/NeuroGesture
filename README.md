@@ -1,5 +1,6 @@
-# NeuroGesture
+# NeuroGesture 
 ## using LeapMotion
+## Alpha version 30 March 2014
 
 |-----------------------------------|
 | Neuro Gesture using Leap Motion |
