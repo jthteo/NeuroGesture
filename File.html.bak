@@ -111,7 +111,7 @@ Edit on
             var html = "<pre>[\n";
             recorded.forEach(function(obj)
                              {
-                             html += JSON.stringify(obj, censor, "\t");
+                             html += JSON.stringify(obj, null, "\t");
                              html += ";\n";
                              });
             html = html.slice(0,html.length-2);

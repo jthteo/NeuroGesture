@@ -8,10 +8,13 @@ version 0.21 (2014)
 
 This software is an Alpha version using the LeapMotion SDK in 2014
 
+Two modes of recording:
+1) Requires NODE.JS server running, and ajax call to server to submit JSON data (/main/index.html)
+2) Uses Websocket to print out JSON output onto same page (/recording_JSON.html)
 
---------------------
- Instructions on use
---------------------
+---------------------------------
+ Instructions on use the NODE JS
+---------------------------------
 
 1) Unzip the folder.
 
